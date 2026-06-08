@@ -1,0 +1,38 @@
+name: Update agentop formula
+
+# Keeps Formula/agentop.rb in sync with the latest agentop release on npm.
+# Runs on a schedule and can be triggered manually. Pushes to this same repo,
+# so it only needs the default GITHUB_TOKEN (no cross-repo PAT).
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump formula to the latest npm release
+        run: |
+          set -euo pipefail
+          latest=$(npm view agentop version)
+          cur=$(grep -oE 'agentop-[0-9]+\.[0-9]+\.[0-9]+\.tgz' Formula/agentop.rb | sed -E 's/agentop-//; s/\.tgz//')
+          echo "current=$cur latest=$latest"
+          if [ "$cur" = "$latest" ]; then
+            echo "Formula already up to date."
+            exit 0
+          fi
+          url="https://registry.npmjs.org/agentop/-/agentop-${latest}.tgz"
+          sha=$(curl -fsSL "$url" | sha256sum | awk '{print $1}')
+          sed -i -E "s#agentop-[0-9]+\.[0-9]+\.[0-9]+\.tgz#agentop-${latest}.tgz#" Formula/agentop.rb
+          sed -i -E "s#^  sha256 \".*\"#  sha256 \"${sha}\"#" Formula/agentop.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/agentop.rb
+          git commit -m "agentop ${latest}"
+          git push

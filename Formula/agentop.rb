@@ -3,8 +3,8 @@ require "language/node"
 class Agentop < Formula
   desc "Live top-style dashboard for your running AI coding-agent CLI sessions"
   homepage "https://github.com/ktamas77/agentop"
-  url "https://registry.npmjs.org/agentop/-/agentop-0.5.6.tgz"
-  sha256 "346c2c014abc13a835f89bf0e757e078a3e3bcb68a19d5d554783ba7469349e5"
+  url "https://registry.npmjs.org/agentop/-/agentop-0.5.8.tgz"
+  sha256 "859a894cf51c5ad1ced4693979fb595d32451b82fddba17baf1fabd83c302af5"
   license "MIT"
 
   depends_on "node"
